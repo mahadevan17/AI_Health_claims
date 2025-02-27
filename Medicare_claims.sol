@@ -81,6 +81,7 @@ contract Approval{
     MedicineCollectionState public MedicineCollectionstate;
     enum PayementState{pending,paid}
     PayementState public Payementstate;
+    
     uint Patient_ID;
     uint Drug1CRN;
     uint Drug2CRN;
