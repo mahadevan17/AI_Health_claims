@@ -1,3 +1,5 @@
+<b>NOTE: As of now the .sol code file and integration of machine learning is left</b>
+
 <h2>GREETINGS,</h2>  
 
 <p>This project focuses on <b>Detecting fraudulent patient insurance claims</b> through <b>Machine Learning algorithms</b> and securely <b>Storing them on a blockchain</b>.</p>  
