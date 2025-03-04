@@ -1,29 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Greetings DApp</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <title>String Storage DApp</title>
 </head>
 <body>
-    <div class="container">
-        <h1>Greetings DApp</h1>
-        <button id="connectButton">Connect MetaMask</button>
-        <p id="connectedAddress">Not connected</p>
-        <div class="greeting-section">
-            <button id="getGreetingButton">Get Greeting</button>
-            <p id="currentGreeting"></p>
-        </div>
-        <div class="set-greeting-section">
-            <input type="text" id="newGreeting" placeholder="Enter new
-greeting">
-            <button id="setGreetingButton">Set Greeting</button>
-
-        </div>
-        <p id="status"></p>
+  <div class="container">
+    <h1>String Storage DApp</h1>
+    
+    <!-- Connection Status -->
+    <div id="connection-status" class="status"></div>
+    
+    <!-- Input Group -->
+    <div class="input-group">
+      <input type="text" id="inputString" placeholder="Enter a number">
+      <button id="putButton">Put Number</button>
     </div>
-    <script src="app.js"></script>
+    
+    <!-- Get String Button -->
+    <button id="getButton">Get Number</button>
+    
+    <!-- Output Display -->
+    <div id="output" class="output"></div>
+  </div>
+  
+  <!-- Scripts -->
+  <script src="web3.min.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>

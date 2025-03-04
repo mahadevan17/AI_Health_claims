@@ -1,61 +1,54 @@
-let web3;
-let contract;
-const contractABI =[]
+const Web3 = require('web3'); 
 
-const contractAddress = "";
-const connectButton = document.getElementById("connectButton");
-const setGreetingButton = document.getElementById("setGreetingButton");
-const getGreetingButton = document.getElementById("getGreetingButton");
-const connectedAddress = document.getElementById("connectedAddress");
-const currentGreeting = document.getElementById("currentGreeting");
-const status = document.getElementById("status");
-const newGreetingInput = document.getElementById("newGreeting");
-// Connect MetaMask
-connectButton.addEventListener("click", async () => {
-    if (window.ethereum) {
-        web3 = new Web3(window.ethereum);
-        try {
-            const accounts = await window.ethereum.request({ method:
-"eth_requestAccounts" });
-            connectedAddress.innerText = `Connected Account: ${accounts[0]}`;
-            contract = new web3.eth.Contract(contractABI, contractAddress);
-            status.innerText = "Connected to MetaMask!";
-        } catch (error) {
-            status.innerText = "Error connecting to MetaMask: " +
-error.message;
-        }
-    } else {
-        status.innerText = "MetaMask is not installed!";
-    }
-});
-// For Ganache, you can also connect directly without MetaMask:
-// Get Greeting
-getGreetingButton.addEventListener("click", async () => {
-    if (contract) {
-        try {
+// Connect to Ganache
+const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
 
-            const greeting = await contract.methods.getGreetings().call();
-            currentGreeting.innerText = `Current Greeting: ${greeting}`;
-        } catch (error) {
-            status.innerText = "Error fetching greeting: " + error.message;
-        }
+// Replace with your contract's ABI present in hadhatdeployment\artifacts\contracts\SimpleStorage.sol\SimpleStorage.json
+//**************The CONTRACT ABI is in folder hadhatdeployment\artifacts\contracts\SimpleStorage.sol\SimpleStorage.json***************
+const contractABI = []; 
+
+// Replace with your deployed contract's address
+const contractAddress = '';
+
+// Create contract instance
+const contract = new web3.eth.Contract(contractABI, contractAddress);
+
+// Connection status element
+const connectionStatus = document.getElementById('connection-status');
+
+// Check if connected to Ganache
+web3.eth.getAccounts()
+  .then(accounts => {
+    if (accounts.length > 0) {
+      connectionStatus.innerText = `Connected to Ganache: ${accounts.length} account(s) found.`;
+      connectionStatus.style.color = 'green';
     } else {
-        status.innerText = "Please connect MetaMask first.";
+      connectionStatus.innerText = 'No accounts found. Please check Ganache.';
+      connectionStatus.style.color = 'red';
     }
-});
-// Set Greeting
-setGreetingButton.addEventListener("click", async () => {
-    const newGreeting = newGreetingInput.value;
-    if (contract && newGreeting !== "") {
-        try {
-            const accounts = await web3.eth.getAccounts();
-            await contract.methods.setGreetings(newGreeting).send({
-from:address[0] , gas: 3000000 });
-            status.innerText = "Greeting updated successfully!";
-        } catch (error) {
-            status.innerText = "Error setting greeting: " + error.message;
-        }
-    } else {
-        status.innerText = "Please connect MetaMask and enter a new greeting.";
-    }
+  })
+  .catch(error => {
+    console.error('Error connecting to Ganache:', error);
+    connectionStatus.innerText = 'Error connecting to Ganache. Please ensure it is running.';
+    connectionStatus.style.color = 'red';
+  });
+
+// Function to store a string
+async function setString(value) {
+  const accounts = await web3.eth.getAccounts();
+  await contract.methods.set(value).send({ from: accounts[0] });
+}
+
+// Function to retrieve a string
+async function getString() {
+  const result = await contract.methods.get().call();
+  console.log('Retrieved string:', result);
+  document.getElementById('output').innerText = result;
+}
+
+// Event listeners for buttons
+document.getElementById('getButton').addEventListener('click', getString);
+document.getElementById('putButton').addEventListener('click', () => {
+  const value = document.getElementById('inputString').value;
+  setString(value);
 });
