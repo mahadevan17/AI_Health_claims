@@ -1,6 +1,5 @@
 const Web3 = require('web3'); 
 
-// Connect to Ganache
 const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
 
 // Replace with your contract's ABI present in hadhatdeployment\artifacts\contracts\SimpleStorage.sol\SimpleStorage.json
@@ -29,26 +28,42 @@ web3.eth.getAccounts()
   })
   .catch(error => {
     console.error('Error connecting to Ganache:', error);
-    connectionStatus.innerText = 'Error connecting to Ganache. Please ensure it is running.';
+    connectionStatus.innerText = 'Error connecting to ethereum node. Please ensure it is running.';
     connectionStatus.style.color = 'red';
   });
 
-// Function to store a string
-async function setString(value) {
-  const accounts = await web3.eth.getAccounts();
-  await contract.methods.set(value).send({ from: accounts[0] });
+// All registration functions
+
+async function PhysiciansRegistration(value) {
+    const accounts = await web3.eth.getAccounts();
+    await contract.methods.PhysicianRegistration(value).send({ from: accounts[0] });
 }
 
-// Function to retrieve a string
-async function getString() {
-  const result = await contract.methods.get().call();
-  console.log('Retrieved string:', result);
-  document.getElementById('output').innerText = result;
+async function InsuranceCompaniesRegistration(value) {
+    const accounts = await web3.eth.getAccounts();
+    await contract.methods.InsuranceCompanyRegistration(value).send({ from: accounts[0] });
+}
+async function PharmaciesRegistration(value) {
+    const accounts = await web3.eth.getAccounts();
+    await contract.methods.PharmacyRegistration(value).send({ from: accounts[0] });
 }
 
+async function PatientsRegistration(value) {
+    const accounts = await web3.eth.getAccounts();
+    await contract.methods.PatientRegisteration(value).send({ from: accounts[0] });
+}
+
+
+document.getElementById('Physician_Registration').addEventListener('click', PhysiciansRegistration);
+document.getElementById('Patient_Registration').addEventListener('click', PatientsRegistration);
+document.getElementById('InsuranceCompanyRegistration').addEventListener('click', InsuranceCompaniesRegistration);
+document.getElementById('Pharmacy_Registration').addEventListener('click', PharmaciesRegistration);
 // Event listeners for buttons
+//this is for puting(sending) value
 document.getElementById('getButton').addEventListener('click', getString);
+
+//this is for geting(receiving) and displaying value
 document.getElementById('putButton').addEventListener('click', () => {
-  const value = document.getElementById('inputString').value;
+const value = document.getElementById('inputString').value;
   setString(value);
 });

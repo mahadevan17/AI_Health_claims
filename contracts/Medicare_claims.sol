@@ -34,7 +34,7 @@ contract Registration{
     function PhysicianRegistration(address _Physician) OnlyRegulatoryAuthority external {
         require(!physicians[_Physician], "Physician already registered");
         physicians[_Physician] = true;
-        emit InsuranceCompanyRegistered(address(_Physician));
+        emit PhysicianRegistered(address(_Physician));
     }
 
     //InsuaranceCompanyRegistration : to register Insurance Comany using it's address
@@ -52,7 +52,7 @@ contract Registration{
     }
 
     //patientRegistration: to register patient using their Address
-    function PatientRegister(address _patient) OnlyRegulatoryAuthority external{
+    function PatientRegisteration(address _patient) OnlyRegulatoryAuthority external{
         require(!patients[_patient], "Patient already registered");
         patients[_patient] = true;
         emit PatientRegistered(address(_patient));
