@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Greetings DApp</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Greetings DApp</h1>
+        <button id="connectButton">Connect MetaMask</button>
+        <p id="connectedAddress">Not connected</p>
+        <div class="greeting-section">
+            <button id="getGreetingButton">Get Greeting</button>
+            <p id="currentGreeting"></p>
+        </div>
+        <div class="set-greeting-section">
+            <input type="text" id="newGreeting" placeholder="Enter new
+greeting">
+            <button id="setGreetingButton">Set Greeting</button>
+
+        </div>
+        <p id="status"></p>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
