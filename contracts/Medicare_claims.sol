@@ -172,7 +172,7 @@ contract Approval {
         Drug2CRN = Drug2CRN_;
         Drug3CRN = Drug3CRN_;
         InsuranceApprovalstate = InsuranceApprovalState.Pending;
-        emit RequestInsuranceApprovalStateChanged(msg.sender, PatientID);
+        emit RequestInsuranceApprovalStateChanged(msg.sender, Patient_ID);
     }
 
     // Insurance Approval (Insurance Company only)
@@ -182,11 +182,11 @@ contract Approval {
 
         Patient_ID = patient_;
         if (_insApproval == InsuranceApprovalState.Approved){
-            emit RequestApproval(msg.sender, 1 ,PatientID, address(_Pharmacyaddress) );
+            emit RequestApproval(msg.sender, 1 ,Patient_ID, address(_Pharmacy) );
         }
 
         if (_insApproval == InsuranceApprovalState.Rejected){
-            emit RequestRejection(msg.sender, 2 , PatientID, address(_Pharmacyaddress));
+            emit RequestRejection(msg.sender, 2 , Patient_ID, address(_Pharmacy));
         }
 
     }
@@ -196,7 +196,7 @@ contract Approval {
         require(InsuranceApprovalstate == InsuranceApprovalState.Approved, "Claim is rejected");
         Patient_ID = patient_;
         MedicineCollectionstate = MedicineCollectionState.ReadyForCollection;
-        emit medicationisprepread (msg.sender, PatientID);
+        emit medicationisprepread (msg.sender, Patient_ID);
     }
 
     // Medication Collection (Patient only)
@@ -204,7 +204,7 @@ contract Approval {
         require(MedicineCollectionstate == MedicineCollectionState.ReadyForCollection, "Not ready, try again later");
         Patient_ID = patient_;
         MedicineCollectionstate = MedicineCollectionState.Collected;
-        emit medicationcollected (msg.sender, PatientID, bytes32(bytes(_IPFShash)));
+        emit medicationcollected (msg.sender, Patient_ID, bytes32(IPFShash));
     }
 
     // Payment Request (Pharmacy only)
@@ -213,7 +213,7 @@ contract Approval {
         MedicationInvoice_ID = MedicationInvoiceId_;
         DrugTotalCost = Drugtotalcost;
         Paymentstate = PaymentState.Pending;
-        emit PaymentRequested (msg.sender, medicationinvoiceID);
+        emit PaymentRequested (msg.sender, MedicationInvoice_ID);
     }
 
     // Claim Payment (Insurance Company only)
@@ -222,6 +222,6 @@ contract Approval {
         require(msg.value == DrugTotalCost, "Paid amount does not match the claim");
         MedicationInvoice_ID = _medicationinvoiceID;
         Paymentstate = PaymentState.Paid;
-        emit ClaimPaid (msg.sender, medicationinvoiceID);
+        emit ClaimPaid (msg.sender, MedicationInvoice_ID);
     }
 }
