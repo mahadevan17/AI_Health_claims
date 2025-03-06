@@ -1,237 +1,227 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.15;
 
-
-contract Registration{
-    //the variables
+contract Registration {
+    // Variables
     address public regulatory_authority;
 
-    mapping(address=>bool) public patients;
-    mapping(address=>bool) public insuranceCompanies;
-    mapping(address=>bool) public physicians;
-    mapping(address=>bool) public pharmacies;
+    mapping(address => bool) public patients;
+    mapping(address => bool) public insuranceCompanies;
+    mapping(address => bool) public physicians;
+    mapping(address => bool) public pharmacies;
 
-    constructor(){
+    constructor() {
         regulatory_authority = msg.sender;
     }
 
-    //modifiers
-    modifier OnlyRegulatoryAuthority(){
-        require(msg.sender==regulatory_authority,"Only regulatory authority can register");
+    // Modifiers
+    modifier OnlyRegulatoryAuthority() {
+        require(msg.sender == regulatory_authority, "Only regulatory authority can register");
         _;
     }
 
-
-    //events
+    // Events
     event PhysicianRegistered(address indexed physician);
     event InsuranceCompanyRegistered(address indexed insuranceCompany);
     event PharmacyRegistered(address indexed pharmacy);
     event PatientRegistered(address indexed patient);
 
-    //The functions
+    // Functions
 
-    //PhysicianRegistration : to register physician using there address
-    function PhysicianRegistration(address _Physician) OnlyRegulatoryAuthority external {
+    function PhysicianRegistration(address _Physician) external OnlyRegulatoryAuthority {
         require(!physicians[_Physician], "Physician already registered");
         physicians[_Physician] = true;
-        emit PhysicianRegistered(address(_Physician));
+        emit PhysicianRegistered(_Physician);
     }
 
-    //InsuaranceCompanyRegistration : to register Insurance Comany using it's address
-    function InsuranceCompanyRegistration(address _insuranceCompany) OnlyRegulatoryAuthority external {
+    function InsuranceCompanyRegistration(address _insuranceCompany) external OnlyRegulatoryAuthority {
         require(!insuranceCompanies[_insuranceCompany], "Insurance company already registered");
         insuranceCompanies[_insuranceCompany] = true;
-        emit InsuranceCompanyRegistered(address(_insuranceCompany));
-    }
-    
-    //PharmacyRegistration: to register pharmacy using it's addresss
-    function PharmacyRegistration(address _pharmacy) OnlyRegulatoryAuthority external{
-        require(!pharmacies[_pharmacy], "Pharmacy already registered");
-        pharmacies[_pharmacy] = true;
-        emit PharmacyRegistered(address(_pharmacy));
+        emit InsuranceCompanyRegistered(_insuranceCompany);
     }
 
-    //patientRegistration: to register patient using their Address
-    function PatientRegisteration(address _patient) OnlyRegulatoryAuthority external{
+    function PharmacyRegistration(address _pharmacy) external OnlyRegulatoryAuthority {
+        require(!pharmacies[_pharmacy], "Pharmacy already registered");
+        pharmacies[_pharmacy] = true;
+        emit PharmacyRegistered(_pharmacy);
+    }
+
+    function PatientRegistration(address _patient) external OnlyRegulatoryAuthority {
         require(!patients[_patient], "Patient already registered");
         patients[_patient] = true;
-        emit PatientRegistered(address(_patient));
+        emit PatientRegistered(_patient);
     }
 }
 
-
-contract Approval{
-
-    //the variables
-
+contract Approval {
     Registration reg;
 
-    struct PharmacySelect{             //Used to store and map patients to the Pharmacies they select
+    struct PharmacySelect {
         address registeredPharmacy;
         bool isSelected;
     }
 
-    mapping(address => PharmacySelect[]) public PharmaciesSelection; //Links Pharmacys to the patients that selected them
-    mapping(address=>uint) selectionCounter;
+    mapping(address => PharmacySelect[]) public PharmaciesSelection;
+    mapping(address => uint) public selectionCounter;
 
-    bytes32 IPFShash;
-    enum ApprovalRequestState{Pending,Approved}  
+    bytes32 public IPFShash;
+
+    enum ApprovalRequestState { Pending, Approved }
     ApprovalRequestState public ApprovalState;
-    enum InsuranceApprovalState{Pending,Approved,Rejected}
+
+    enum InsuranceApprovalState { Pending, Approved, Rejected }
     InsuranceApprovalState public InsuranceApprovalstate;
-    enum MedicineCollectionState{ReadyForCollection,Collected}
+
+    enum MedicineCollectionState { ReadyForCollection, Collected }
     MedicineCollectionState public MedicineCollectionstate;
-    enum PaymentState{pending,paid}
+
+    enum PaymentState { Pending, Paid }
     PaymentState public Paymentstate;
 
-    uint Patient_ID;
-    uint Drug1CRN;
-    uint Drug2CRN;
-    uint Drug3CRN;
-    uint MedicationInvoice_ID;
-    uint DrugTotalCost;
-    uint PaidAmount;
+    uint public Patient_ID;
+    uint public Drug1CRN;
+    uint public Drug2CRN;
+    uint public Drug3CRN;
+    uint public MedicationInvoice_ID;
+    uint public DrugTotalCost;
+    uint public PaidAmount;
 
-    //constructor
-
+    // Constructor
     constructor(address _reg_contract_address) {
         reg = Registration(_reg_contract_address);
     }
 
-    //modifiers
-    modifier OnlyPhysician(){
-        require(reg.physicians(msg.sender),"Only Physician can create Prescription");
+    // Modifiers
+    modifier OnlyPhysician() {
+        require(reg.physicians(msg.sender), "Only Physician can create Prescription");
         _;
     }
 
-    modifier OnlyPatient(){
-        require(reg.patients(msg.sender),"Only Patient is allwoed to select pharmacies");
+    modifier OnlyPatient() {
+        require(reg.patients(msg.sender), "Only Patient is allowed to select pharmacies");
         _;
     }
 
-    modifier OnlyPharmacy(){
-        require(reg.pharmacies(msg.sender),"Only registered pharmacies is allowed");
+    modifier OnlyPharmacy() {
+        require(reg.pharmacies(msg.sender), "Only registered pharmacy is allowed");
         _;
     }
 
-    modifier OnlyInsuranceCompany(){
-        require(reg.insuranceCompanies(msg.sender),"Only Insurance company can call this function");
+    modifier OnlyInsuranceCompany() {
+        require(reg.insuranceCompanies(msg.sender), "Only Insurance company can call this function");
         _;
     }
 
-    //events
+    // Events
+    event PrescriptionCreated(address indexed Physician, uint PatientID, bytes32 _IPFShash);
 
-    event PresciptionCreated(address indexed Physician, uint PatientID,bytes32 _IPFShash );
-    event PharmacyApprovalStateChanged();
-    event PharmacySelected(address indexed,uint);
-    event RequestInsuranceApprovalStateChanged();
-    event InsuranceApprovalStateChanged();
-    event MedicationPreperationStateChanged();
-    event MedicationCollected();
-    event PaymentRequested();
-    event PaymentClaimed();
+    event PharmacyApprovalStateChanged(address indexed pharmacy, uint status);
+    
+    event PharmacySelected(address indexed patient, uint selectionCount);
+    event RequestInsuranceApprovalStateChanged(address _pharmacy, uint PatientID);
+    event RequestApproval(address Insurance_Company , uint insuranceApprovalstatus,  uint PatientID, address _Pharmacyaddress);
+    event RequestRejection (address Insurance_Company , uint insuranceApprovalstatus,  uint PatientID, address _Pharmacyaddress);
+    event medicationisprepread (address _pharmacy, uint PatientID);
+    event medicationcollected (address Patient, uint PatientID, bytes32 _IPFShash );
+    event PaymentRequested (address _pharmacy, uint medicationinvoiceID);
+    event ClaimPaid (address Insurance_Company, uint medicationinvoiceID);
 
-    //functions to implement
+    // Prescription creation (Physician only)
+    function PrescriptionCreation(uint Patient_Id, uint Drug1CRN_, uint Drug2CRN_, uint Drug3CRN_, string memory IPFShash_) external OnlyPhysician {
+        Patient_ID = Patient_Id;
+        Drug1CRN = Drug1CRN_;
+        Drug2CRN = Drug2CRN_;
+        Drug3CRN = Drug3CRN_;
+        IPFShash = bytes32(bytes(IPFShash_));
 
-    //PrescriptionCreation functiona can be run by registered physician only
-    function PresciptionCreation(uint Patient_Id,uint Drug1CRN_,uint Drug2CRN_,uint Drug3CRN_ ,string memory IPFShash_) OnlyPhysician external {
-
-        Patient_ID=Patient_Id;
-        Drug1CRN=Drug1CRN_;
-        Drug2CRN=Drug2CRN_;
-        Drug3CRN=Drug3CRN_;
-
-        emit PresciptionCreated(msg.sender,Patient_ID,bytes32(bytes(IPFShash_)));
+        emit PrescriptionCreated(msg.sender, Patient_ID, IPFShash);
     }
 
-    //PharmacySelection
-    function Pharmacies_Selection(address Pharmacy_) OnlyPatient external{
-        require(selectionCounter[msg.sender]<5,"You cannot select more that 5 Pharmacies");
-        require(reg.pharmacies(Pharmacy_) == true, "only registered Pharmacys can be selected");
+    // Patient selects a pharmacy (Patient only)
+    function Pharmacies_Selection(address Pharmacy_) external OnlyPatient {
+        require(selectionCounter[msg.sender] < 5, "You cannot select more than 5 Pharmacies");
+        require(reg.pharmacies(Pharmacy_), "Only registered Pharmacies can be selected");
 
         PharmaciesSelection[msg.sender].push(PharmacySelect(Pharmacy_, true));
         selectionCounter[msg.sender]++;
-        ApprovalState=ApprovalRequestState.Pending;
+        ApprovalState = ApprovalRequestState.Pending;
         emit PharmacySelected(msg.sender, selectionCounter[msg.sender]);
     }
 
-    //PharmacyApproval
-    function PharmacyApproval(address Patient_) OnlyPharmacy external{
-        require(ApprovalState == ApprovalRequestState.Pending, "Request is already proccessed");
-        for(uint i=0;i<selectionCounter[Patient_];i++){
-            if (PharmaciesSelection[Patient_][i].registeredPharmacy==msg.sender && PharmaciesSelection[Patient_][i].isSelected==true){
-                ApprovalState=ApprovalRequestState.Approved;
+    // Pharmacy Approval (Pharmacy only)
+    function PharmacyApproval(address Patient_) external OnlyPharmacy {
+        require(ApprovalState == ApprovalRequestState.Pending, "Request is already processed");
+
+        for (uint i = 0; i < selectionCounter[Patient_]; i++) {
+            if (PharmaciesSelection[Patient_][i].registeredPharmacy == msg.sender &&
+                PharmaciesSelection[Patient_][i].isSelected) {
+                ApprovalState = ApprovalRequestState.Approved;
+                emit PharmacyApprovalStateChanged(msg.sender, 1);
+                return;
             }
         }
-        emit PharmacyApprovalStateChanged();
+        emit PharmacyApprovalStateChanged(msg.sender, 0);
     }
 
-    
-    //RequestInsuranceApproval 
-    function RequestInsuranceApproval(uint Patient_,uint Drug1CRN_,uint Drug2CRN_,uint Drug3CRN_) OnlyPharmacy external {
+    // Request Insurance Approval (Pharmacy only)
+    function RequestInsuranceApproval(uint Patient_, uint Drug1CRN_, uint Drug2CRN_, uint Drug3CRN_) external OnlyPharmacy {
+        require(ApprovalState == ApprovalRequestState.Approved, "Pharmacy approval required");
+
         Patient_ID = Patient_;
-        Drug1CRN=Drug1CRN_;
-        Drug2CRN=Drug2CRN_; 
-        Drug3CRN=Drug3CRN_; 
-        InsuranceApprovalstate=InsuranceApprovalState.Pending;
-        emit RequestInsuranceApprovalStateChanged();
+        Drug1CRN = Drug1CRN_;
+        Drug2CRN = Drug2CRN_;
+        Drug3CRN = Drug3CRN_;
+        InsuranceApprovalstate = InsuranceApprovalState.Pending;
+        emit RequestInsuranceApprovalStateChanged(msg.sender, PatientID);
     }
-    
 
-    //InsuranceApproval
-    function InsuranceApproval(InsuranceApprovalState _insApproval,address _Pharmacy,uint patient_) OnlyInsuranceCompany external{
+    // Insurance Approval (Insurance Company only)
+    function InsuranceApproval(InsuranceApprovalState _insApproval, address _Pharmacy, uint patient_) external OnlyInsuranceCompany {
+        require(reg.pharmacies(_Pharmacy), "Pharmacy not registered");
+        require(InsuranceApprovalstate == InsuranceApprovalState.Pending, "Request already processed");
 
-        require(reg.pharmacies(_Pharmacy)==true,"Pharmacy not registered");
-        require(InsuranceApprovalstate == InsuranceApprovalState.Pending,"Request already proccessed");
-        Patient_ID=patient_;
-
-        if (_insApproval==InsuranceApprovalState.Approved){
-            emit InsuranceApprovalStateChanged();
+        Patient_ID = patient_;
+        if (_insApproval == InsuranceApprovalState.Approved){
+            emit RequestApproval(msg.sender, 1 ,PatientID, address(_Pharmacyaddress) );
         }
 
         if (_insApproval == InsuranceApprovalState.Rejected){
-        
-         emit InsuranceApprovalStateChanged();
+            emit RequestRejection(msg.sender, 2 , PatientID, address(_Pharmacyaddress));
         }
-    }
-
-    //MediacationPreparation
-    function MedicationPreparetion(uint patient_) OnlyPharmacy external{
-        require(InsuranceApprovalstate==InsuranceApprovalState.Approved,"Claim is rejected");
-        Patient_ID=patient_;
-        MedicineCollectionstate==MedicineCollectionState.ReadyForCollection;
-
-        emit MedicationPreperationStateChanged();
-    } 
-
-    //MedicationCollection
-    function MedicationCollection(uint patient_,bytes32 hash_)OnlyPatient external{
-        require(MedicineCollectionstate==MedicineCollectionState.ReadyForCollection,"Not ready Try again later");
-        Patient_ID=patient_;
-        MedicineCollectionstate==MedicineCollectionState.Collected;
-
-        emit MedicationCollected();
 
     }
 
-    //PaymentRequest
-    function PaymentRequest(uint MedicationInvoiceId_,uint Drugtotalcost)OnlyPharmacy external{
-        require(MedicineCollectionstate==MedicineCollectionState.Collected,"wait till medicine is collected");
-        MedicationInvoice_ID=MedicationInvoiceId_;
-        DrugTotalCost=Drugtotalcost;
-        Paymentstate==PaymentState.pending;
-
-        emit PaymentRequested();
+    // Medication Preparation (Pharmacy only)
+    function MedicationPreparation(uint patient_) external OnlyPharmacy {
+        require(InsuranceApprovalstate == InsuranceApprovalState.Approved, "Claim is rejected");
+        Patient_ID = patient_;
+        MedicineCollectionstate = MedicineCollectionState.ReadyForCollection;
+        emit medicationisprepread (msg.sender, PatientID);
     }
 
-    //ClaimPayment
-    function ClaimPayment(uint MedicationInvoiceId_) OnlyInsuranceCompany external payable  {
-        MedicationInvoice_ID=MedicationInvoiceId_;
-        require(Paymentstate == PaymentState.pending, "Can't claim payment");
-        require(msg.value == DrugTotalCost, "Paid Amount is not covering the claim");
-        Paymentstate = PaymentState.paid;
-        //require(msg.value==totalDrugCost, "amount mismatch,please check again");
-        
-        emit PaymentClaimed();
+    // Medication Collection (Patient only)
+    function MedicationCollection(uint patient_) external OnlyPatient {
+        require(MedicineCollectionstate == MedicineCollectionState.ReadyForCollection, "Not ready, try again later");
+        Patient_ID = patient_;
+        MedicineCollectionstate = MedicineCollectionState.Collected;
+        emit medicationcollected (msg.sender, PatientID, bytes32(bytes(_IPFShash)));
+    }
+
+    // Payment Request (Pharmacy only)
+    function PaymentRequest(uint MedicationInvoiceId_, uint Drugtotalcost) external OnlyPharmacy {
+        require(MedicineCollectionstate == MedicineCollectionState.Collected, "Wait till medicine is collected");
+        MedicationInvoice_ID = MedicationInvoiceId_;
+        DrugTotalCost = Drugtotalcost;
+        Paymentstate = PaymentState.Pending;
+        emit PaymentRequested (msg.sender, medicationinvoiceID);
+    }
+
+    // Claim Payment (Insurance Company only)
+    function ClaimPayment(uint _medicationinvoiceID) external OnlyInsuranceCompany payable {
+        require(Paymentstate == PaymentState.Pending, "Can't claim payment");
+        require(msg.value == DrugTotalCost, "Paid amount does not match the claim");
+        MedicationInvoice_ID = _medicationinvoiceID;
+        Paymentstate = PaymentState.Paid;
+        emit ClaimPaid (msg.sender, medicationinvoiceID);
     }
 }
