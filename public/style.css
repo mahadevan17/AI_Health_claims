@@ -37,3 +37,7 @@ body {
         color:red;
         font-weight: bold;
     }
+
+    #addresses {
+        position: fixed;    
+    }

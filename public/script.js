@@ -1,11 +1,7 @@
-//const Web3 = require('web3'); 
-
 const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
 
-// Replace with your contract's ABI present in hadhatdeployment\artifacts\contracts\SimpleStorage.sol\SimpleStorage.json
-//**************The CONTRACT ABI is in folder hadhatdeployment\artifacts\contracts\SimpleStorage.sol\SimpleStorage.json***************
 //*************************THERE ARE TWO CONTRACTS SO NEED TO INITIALIZE 2 CONTRACTS ************************************/
-// Replace with your deployed contract's address
+// Replace with your deployed contract's ABI and address
 const Registration_contractABI = [{
   "inputs": [],
   "stateMutability": "nonpayable",
@@ -832,6 +828,17 @@ web3.eth.getAccounts()
     if (accounts.length > 0) {
       connectionStatus.innerText = `Connected to Ganache: ${accounts.length} account(s) found.`;
       connectionStatus.style.color = 'green';
+      accountDropdown.innerHTML = '<option value="">Select an account</option>';
+      
+      // Populate dropdown with account addresses
+      accounts.forEach(account => {
+        const option = document.createElement('option');
+        option.value = account;
+        option.textContent = account;
+        accountDropdown.appendChild(option);
+      });
+
+
     } else {
       connectionStatus.innerText = 'No accounts found. Please check Ganache.';
       connectionStatus.style.color = 'red';
@@ -847,8 +854,14 @@ web3.eth.getAccounts()
 
 async function PhysiciansRegistration(value) {
     try{
-      const accounts = await web3.eth.getAccounts();
-      await RegistrationContract.methods.PhysicianRegistration(value).send({ from: accounts[0] });
+      const accountDropdown = document.getElementById('accountDropdown');
+      const selectedAccount = accountDropdown.value; // Get the selected account from the dropdown
+    
+    if (!selectedAccount) {
+      alert('Please select an account first.');
+      return;
+    }
+      await RegistrationContract.methods.PhysicianRegistration(value).send({ from: selectedAccount });
       console.log('Physician registration successful.');
       alert('Physician registration successful.');
     }
@@ -860,8 +873,14 @@ async function PhysiciansRegistration(value) {
 
 async function InsuranceCompaniesRegistration(value) {
   try{
-    const accounts = await web3.eth.getAccounts();
-    await RegistrationContract.methods.InsuranceCompanyRegistration(value).send({ from: accounts[0] });
+    const accountDropdown = document.getElementById('accountDropdown');
+    const selectedAccount = accountDropdown.value; // Get the selected account from the dropdown
+    
+    if (!selectedAccount) {
+      alert('Please select an account first.');
+      return;
+    }
+    await RegistrationContract.methods.InsuranceCompanyRegistration(value).send({ from: selectedAccount });
     console.log('Insurance Company registration successful.');
     alert('Insurance Company registration successful.');
   }catch(error){
@@ -871,8 +890,14 @@ async function InsuranceCompaniesRegistration(value) {
 }
 async function PharmaciesRegistration(value) {
     try{
-      let accounts = await web3.eth.getAccounts();
-      await RegistrationContract.methods.PharmacyRegistration(value).send({ from: accounts[0] });
+      const accountDropdown = document.getElementById('accountDropdown');
+    const selectedAccount = accountDropdown.value; // Get the selected account from the dropdown
+    
+    if (!selectedAccount) {
+      alert('Please select an account first.');
+      return;
+    }
+      await RegistrationContract.methods.PharmacyRegistration(value).send({ from: selectedAccount });
     }catch(error){
       console.error('Error registering pharmacy:', error);}
       alert('!!Error!! Pharmacy registration Unsuccessful.');
@@ -880,8 +905,14 @@ async function PharmaciesRegistration(value) {
 
 async function PatientsRegistration(value) {
     try{
-      let accounts = await web3.eth.getAccounts();
-      await RegistrationContract.PatientRegisteration(value).send({ from: accounts[0] });
+      const accountDropdown = document.getElementById('accountDropdown');
+    const selectedAccount = accountDropdown.value; // Get the selected account from the dropdown
+    
+    if (!selectedAccount) {
+      alert('Please select an account first.');
+      return;
+    }
+      await RegistrationContract.PatientRegistration(value).send({ from: selectedAccount });
     }catch(error){
       console.error('Error registering patient:', error);}
       alert('!!Error!! Patient registration Unsuccessful.');
@@ -891,8 +922,14 @@ async function PatientsRegistration(value) {
 //APPROVAL************************************************
 async function PresciptionCreation(patientid,drug1,drug2,drug3) {
   try {
-  let accounts = await web3.eth.getAccounts();
-  await ApprovalContract.methods.PresciptionCreation(patientid,drug1,drug2,drug3).send({ from: accounts[1] });
+    const accountDropdown = document.getElementById('accountDropdown');
+    const selectedAccount = accountDropdown.value; // Get the selected account from the dropdown
+    
+    if (!selectedAccount) {
+      alert('Please select an account first.');
+      return;
+    }
+  await ApprovalContract.methods.PresciptionCreation(patientid,drug1,drug2,drug3).send({ from: selectedAccount });
   } catch (error) {
     console.error('Error creating prescription:', error);
     alert('!!Error!! Prescription creation Unsuccessful. check if 1)patient is registered 2)request is coming from registered physician');
@@ -902,8 +939,14 @@ async function PresciptionCreation(patientid,drug1,drug2,drug3) {
 
 async function PharmacySelection(value) {
   try {
-  let accounts = await web3.eth.getAccounts();
-  await ApprovalContract.methods.Pharmacies_Selection(value).send({ from: accounts[1] });
+    const accountDropdown = document.getElementById('accountDropdown');
+    const selectedAccount = accountDropdown.value; // Get the selected account from the dropdown
+    
+    if (!selectedAccount) {
+      alert('Please select an account first.');
+      return;
+    }
+  await ApprovalContract.methods.Pharmacies_Selection(value).send({ from: selectedAccount });
   } catch (error) {
     console.error('Error selecting pharmacy:', error);
     alert('!!Error!! Pharmacy selection Unsuccessful.');
@@ -913,8 +956,14 @@ async function PharmacySelection(value) {
 
 async function PharmacyApproval(value) {
   try {
-  let accounts = await web3.eth.getAccounts();
-  await ApprovalContract.methods.PharmacyApproval(value).send({ from: accounts[1] });
+    const accountDropdown = document.getElementById('accountDropdown');
+    const selectedAccount = accountDropdown.value; // Get the selected account from the dropdown
+    
+    if (!selectedAccount) {
+      alert('Please select an account first.');
+      return;
+    }
+  await ApprovalContract.methods.PharmacyApproval(value).send({ from: selectedAccount });
   } catch (error) {
     console.error('Error approving pharmacy:', error);
     alert('!!Error!! Pharmacy approval Unsuccessful.');
@@ -924,8 +973,14 @@ async function PharmacyApproval(value) {
 
 async function InsuranceApprovalRequest(value) {
   try {
-  let accounts = await web3.eth.getAccounts();
-  await ApprovalContract.methods.RequestInsuranceApproval(value).send({ from: accounts[1] });
+    const accountDropdown = document.getElementById('accountDropdown');
+    const selectedAccount = accountDropdown.value; // Get the selected account from the dropdown
+    
+    if (!selectedAccount) {
+      alert('Please select an account first.');
+      return;
+    }
+  await ApprovalContract.methods.RequestInsuranceApproval(value).send({ from: selectedAccount });
   }catch(error){
     console.error('Error requesting insurance approval:', error);
     alert('!!Error!! Insurance approval request Unsuccessful.');
@@ -934,8 +989,14 @@ async function InsuranceApprovalRequest(value) {
 
 async function InsuranceApproval(pharmacyid,patientid) {
   try {
-  let accounts = await web3.eth.getAccounts();
-  await ApprovalContract.methods.RequestInsuranceApproval(pending,pharmacyid,patientid).send({ from: accounts[1] });
+    const accountDropdown = document.getElementById('accountDropdown');
+    const selectedAccount = accountDropdown.value; // Get the selected account from the dropdown
+    
+    if (!selectedAccount) {
+      alert('Please select an account first.');
+      return;
+    }
+  await ApprovalContract.methods.RequestInsuranceApproval(pending,pharmacyid,patientid).send({ from: selectedAccount});
   } catch (error) {
     console.error('Error requesting insurance approval:', error);
     alert("!!Error!! Insurance approval Unsuccessful.");
@@ -944,8 +1005,14 @@ async function InsuranceApproval(pharmacyid,patientid) {
 
 async function medicine_preparation(value) {
   try{
-  let accounts = await web3.eth.getAccounts();
-  await ApprovalContract.methods.MedicationPreparetion(value).send({ from: accounts[1] });
+    const accountDropdown = document.getElementById('accountDropdown');
+    const selectedAccount = accountDropdown.value; // Get the selected account from the dropdown
+    
+    if (!selectedAccount) {
+      alert('Please select an account first.');
+      return;
+    }
+  await ApprovalContract.methods.MedicationPreparetion(value).send({ from: selectedAccount });
   } catch (error) {
     console.error('Error preparing medication:', error);
     alert('!!Error!! Medication preparation Unsuccessful.');
@@ -954,8 +1021,14 @@ async function medicine_preparation(value) {
 
 async function medicine_collection(value) {
   try{
-  let accounts = await web3.eth.getAccounts();
-  await ApprovalContract.methods.MedicationCollection(value).send({ from: accounts[1] });
+    const accountDropdown = document.getElementById('accountDropdown');
+    const selectedAccount = accountDropdown.value; // Get the selected account from the dropdown
+    
+    if (!selectedAccount) {
+      alert('Please select an account first.');
+      return;
+    }
+  await ApprovalContract.methods.MedicationCollection(value).send({ from: selectedAccount });
   }catch(error){
     console.error('Error collecting medication:', error);
     alert('!!Error!! Medication collection Unsuccessful.');
@@ -964,8 +1037,14 @@ async function medicine_collection(value) {
 
 async function requestpayment(invoiceid,totalcost) {
   try{
-  let accounts = await web3.eth.getAccounts();
-  await ApprovalContract.methods.PaymentRequest(invoiceid,totalcost).send({ from: accounts[1] });
+    const accountDropdown = document.getElementById('accountDropdown');
+    const selectedAccount = accountDropdown.value; // Get the selected account from the dropdown
+    
+    if (!selectedAccount) {
+      alert('Please select an account first.');
+      return;
+    }
+  await ApprovalContract.methods.PaymentRequest(invoiceid,totalcost).send({ from: selectedAccount });
   }catch(error){
     console.error('Error requesting payment:', error);
     alert('!!Error!! Payment request Unsuccessful.');
@@ -975,8 +1054,14 @@ async function requestpayment(invoiceid,totalcost) {
 
 async function Claimpayment(value) {
   try{
-  let accounts = await web3.eth.getAccounts();
-  await ApprovalContract.methods.ClaimPayment(value).send({ from: accounts[1] });
+    const accountDropdown = document.getElementById('accountDropdown');
+    const selectedAccount = accountDropdown.value; // Get the selected account from the dropdown
+    
+    if (!selectedAccount) {
+      alert('Please select an account first.');
+      return;
+    }
+  await ApprovalContract.methods.ClaimPayment(value).send({ from: selectedAccount });
   }catch(error){
     console.error('Error claiming payment:', error);
     alert('!!Error!! Payment claim Unsuccessful.');
@@ -993,7 +1078,7 @@ document.getElementById('Patient_Registration').addEventListener('click',() =>{
   let patient=document.getElementById('patient_reg').value
   PatientsRegistration(patient)});
 document.getElementById('InsuranceCompanyRegistration').addEventListener('click',()=>{
-  let  InsuranceCompany=document.getElementById('insurance_reg').value
+  let  InsuranceCompany=document.getElementById('Company_reg').value
   InsuranceCompaniesRegistration(InsuranceCompany)});
 document.getElementById('Pharmacy_Registration').addEventListener('click',()=> {
   let Pharmacy=document.getElementById('pharmacy_reg').value
