@@ -1,4 +1,4 @@
-<b>NOTE: As of now the .sol code file and integration of machine learning is left</b>
+<b>NOTE: As of now integration of machine learning is left</b>
 
 <h2>GREETINGS,</h2>  
 
