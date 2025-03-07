@@ -1,4 +1,4 @@
-const Web3 = require('web3'); 
+//const Web3 = require('web3'); 
 
 const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
 
@@ -814,7 +814,7 @@ const Approval_contractABI=[{
     "type": "function"
     }
   ];
-const Approval_contractAddress='xe7f1725E7734CE288F8367e1Bb143E90bb3F0512'
+const Approval_contractAddress='0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512'
 
 
 
@@ -846,76 +846,158 @@ web3.eth.getAccounts()
 // All registration functions
 
 async function PhysiciansRegistration(value) {
-    const accounts = await web3.eth.getAccounts();
-    await RegistrationContract.methods.PhysicianRegistration(value).send({ from: accounts[0] });
+    try{
+      const accounts = await web3.eth.getAccounts();
+      await RegistrationContract.methods.PhysicianRegistration(value).send({ from: accounts[0] });
+      console.log('Physician registration successful.');
+      alert('Physician registration successful.');
+    }
+    catch(error){
+      console.error('Error registering physician:', error);
+      alert('!!ERROR!!Physician registration Unsuccessful.');
+    }
 }
 
 async function InsuranceCompaniesRegistration(value) {
+  try{
     const accounts = await web3.eth.getAccounts();
     await RegistrationContract.methods.InsuranceCompanyRegistration(value).send({ from: accounts[0] });
+    console.log('Insurance Company registration successful.');
+    alert('Insurance Company registration successful.');
+  }catch(error){
+    console.error('Error registering Insurance Company:', error);
+      alert('!!Error!! Insurance Company registration Unsuccessful.');
+  }
 }
 async function PharmaciesRegistration(value) {
-    const accounts = await web3.eth.getAccounts();
-    await RegistrationContract.methods.PharmacyRegistration(value).send({ from: accounts[0] });
-}
+    try{
+      let accounts = await web3.eth.getAccounts();
+      await RegistrationContract.methods.PharmacyRegistration(value).send({ from: accounts[0] });
+    }catch(error){
+      console.error('Error registering pharmacy:', error);}
+      alert('!!Error!! Pharmacy registration Unsuccessful.');
+  }
 
 async function PatientsRegistration(value) {
-    const accounts = await web3.eth.getAccounts();
-    await RegistrationContract.PatientRegisteration(value).send({ from: accounts[0] });
-}
+    try{
+      let accounts = await web3.eth.getAccounts();
+      await RegistrationContract.PatientRegisteration(value).send({ from: accounts[0] });
+    }catch(error){
+      console.error('Error registering patient:', error);}
+      alert('!!Error!! Patient registration Unsuccessful.');
+  }
 
 
 //APPROVAL************************************************
 async function PresciptionCreation(patientid,drug1,drug2,drug3) {
-  const accounts = await web3.eth.getAccounts();
+  try {
+  let accounts = await web3.eth.getAccounts();
   await ApprovalContract.methods.PresciptionCreation(patientid,drug1,drug2,drug3).send({ from: accounts[1] });
+  } catch (error) {
+    console.error('Error creating prescription:', error);
+    alert('!!Error!! Prescription creation Unsuccessful. check if 1)patient is registered 2)request is coming from registered physician');
+  }
+
 }
 
 async function PharmacySelection(value) {
-  const accounts = await web3.eth.getAccounts();
+  try {
+  let accounts = await web3.eth.getAccounts();
   await ApprovalContract.methods.Pharmacies_Selection(value).send({ from: accounts[1] });
+  } catch (error) {
+    console.error('Error selecting pharmacy:', error);
+    alert('!!Error!! Pharmacy selection Unsuccessful.');
+  }
+
 }
 
 async function PharmacyApproval(value) {
-  const accounts = await web3.eth.getAccounts();
+  try {
+  let accounts = await web3.eth.getAccounts();
   await ApprovalContract.methods.PharmacyApproval(value).send({ from: accounts[1] });
+  } catch (error) {
+    console.error('Error approving pharmacy:', error);
+    alert('!!Error!! Pharmacy approval Unsuccessful.');
+  }
+
 }
 
 async function InsuranceApprovalRequest(value) {
-  const accounts = await web3.eth.getAccounts();
+  try {
+  let accounts = await web3.eth.getAccounts();
   await ApprovalContract.methods.RequestInsuranceApproval(value).send({ from: accounts[1] });
+  }catch(error){
+    console.error('Error requesting insurance approval:', error);
+    alert('!!Error!! Insurance approval request Unsuccessful.');
+  }
 }
 
 async function InsuranceApproval(pharmacyid,patientid) {
-  const accounts = await web3.eth.getAccounts();
+  try {
+  let accounts = await web3.eth.getAccounts();
   await ApprovalContract.methods.RequestInsuranceApproval(pending,pharmacyid,patientid).send({ from: accounts[1] });
+  } catch (error) {
+    console.error('Error requesting insurance approval:', error);
+    alert("!!Error!! Insurance approval Unsuccessful.");
+  }
 }
 
 async function medicine_preparation(value) {
-  const accounts = await web3.eth.getAccounts();
+  try{
+  let accounts = await web3.eth.getAccounts();
   await ApprovalContract.methods.MedicationPreparetion(value).send({ from: accounts[1] });
+  } catch (error) {
+    console.error('Error preparing medication:', error);
+    alert('!!Error!! Medication preparation Unsuccessful.');
+  }
 }
 
 async function medicine_collection(value) {
-  const accounts = await web3.eth.getAccounts();
+  try{
+  let accounts = await web3.eth.getAccounts();
   await ApprovalContract.methods.MedicationCollection(value).send({ from: accounts[1] });
+  }catch(error){
+    console.error('Error collecting medication:', error);
+    alert('!!Error!! Medication collection Unsuccessful.');
+  }
 }
 
 async function requestpayment(invoiceid,totalcost) {
-  const accounts = await web3.eth.getAccounts();
+  try{
+  let accounts = await web3.eth.getAccounts();
   await ApprovalContract.methods.PaymentRequest(invoiceid,totalcost).send({ from: accounts[1] });
+  }catch(error){
+    console.error('Error requesting payment:', error);
+    alert('!!Error!! Payment request Unsuccessful.');
+  }
+
 }
 
 async function Claimpayment(value) {
-  const accounts = await web3.eth.getAccounts();
+  try{
+  let accounts = await web3.eth.getAccounts();
   await ApprovalContract.methods.ClaimPayment(value).send({ from: accounts[1] });
+  }catch(error){
+    console.error('Error claiming payment:', error);
+    alert('!!Error!! Payment claim Unsuccessful.');
+  }
 }
 
 //FOR CONTRACT REGISTRATION
-document.getElementById('Physician_Registration').addEventListener('click', PhysiciansRegistration);
-document.getElementById('Patient_Registration').addEventListener('click', PatientsRegistration);
-document.getElementById('InsuranceCompanyRegistration').addEventListener('click', InsuranceCompaniesRegistration);
-document.getElementById('Pharmacy_Registration').addEventListener('click', PharmaciesRegistration);
+document.getElementById('Physician_Registration').addEventListener('click', () => {
+  let Physician=document.getElementById('physician_reg').value
+  PhysiciansRegistration(Physician);
+});
+
+document.getElementById('Patient_Registration').addEventListener('click',() =>{
+  let patient=document.getElementById('patient_reg').value
+  PatientsRegistration(patient)});
+document.getElementById('InsuranceCompanyRegistration').addEventListener('click',()=>{
+  let  InsuranceCompany=document.getElementById('insurance_reg').value
+  InsuranceCompaniesRegistration(InsuranceCompany)});
+document.getElementById('Pharmacy_Registration').addEventListener('click',()=> {
+  let Pharmacy=document.getElementById('pharmacy_reg').value
+  PharmaciesRegistration(Pharmacy)});
 
 //FOR CONTRACT APPROVAL
 document.getElementById('createpresciption').addEventListener('click', () => {
@@ -930,27 +1012,35 @@ document.getElementById('createpresciption').addEventListener('click', () => {
   //document.getElementById('Pharmacy_Registration').addEventListener('click', PharmaciesRegistration);
 
   //pharmacy approval
-  document.getElementById('approvepharmacy').addEventListener('click',PharmacyApproval);
+  document.getElementById('approvepharmacy').addEventListener('click', () => {
+    let patient_id=document.getElementById('patient_id').value;
+    PharmacyApproval(patient_id)});
 
   //request insurance approval
   document.getElementById('requestapproval').addEventListener('click', () => {
-    patientID=document.getElementById('Patient_id_').value;
-    drug1=document.getElementById('Drug1_').value;
-    drug2=document.getElementById('Drug2_').value;
-    drug3=document.getElementById('Drug3_').value;
+    let patientID=document.getElementById('Patient_id_').value;
+    let drug1=document.getElementById('Drug1_').value;
+    let drug2=document.getElementById('Drug2_').value;
+    let drug3=document.getElementById('Drug3_').value;
     InsuranceApprovalRequest(patientID,drug1,drug2,drug3) });
 
 // insurance approval
 document.getElementById('approval').addEventListener('click', () => {
   let pharmacyid=document.getElementById('pharmacy_ID').value;
-  patientID=document.getElementById('patientID').value; 
+  let patientID=document.getElementById('patientID').value; 
   InsuranceApproval(pharmacyid,patientID) });
 
 // medicine preparation
-document.getElementById('preparemedicine').addEventListener('click',medicine_preparation);
+document.getElementById('preparemedicine').addEventListener('click',()=>{
+  let patientid=document.getElementById('patientId').value;
+
+  medicine_preparation(patientid);});
 
 //medicine collection
-document.getElementById('medicinecollect').addEventListener('click',medicine_collection);
+document.getElementById('medicinecollect').addEventListener('click',()=>{
+  let  patientid=document.getElementById('patientId').value;
+
+  medicine_collection(patientid);});
 
 //request payment
 document.getElementById('requestpayment').addEventListener('click',()=>{
@@ -959,4 +1049,7 @@ document.getElementById('requestpayment').addEventListener('click',()=>{
   requestpayment(invoiceid,totalcost) });
 
 //claim payment
-document.getElementById('paymentclaim').addEventListener('click',Claimpayment);
+document.getElementById('paymentclaim').addEventListener('click',()=>{
+  let  invoiceid=document.getElementById('medicineinvoice_id').value;
+
+  Claimpayment(invoiceid)});
