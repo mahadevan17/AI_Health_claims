@@ -881,6 +881,7 @@ async function InsuranceCompaniesRegistration(value) {
       return;
     }
     await RegistrationContract.methods.InsuranceCompanyRegistration(value).send({ from: selectedAccount });
+    
     console.log('Insurance Company registration successful.');
     alert('Insurance Company registration successful.');
   }catch(error){
@@ -890,7 +891,7 @@ async function InsuranceCompaniesRegistration(value) {
 }
 async function PharmaciesRegistration(value) {
     try{
-      const accountDropdown = document.getElementById('accountDropdown');
+    const accountDropdown = document.getElementById('accountDropdown');
     const selectedAccount = accountDropdown.value; // Get the selected account from the dropdown
     
     if (!selectedAccount) {
@@ -898,24 +899,31 @@ async function PharmaciesRegistration(value) {
       return;
     }
       await RegistrationContract.methods.PharmacyRegistration(value).send({ from: selectedAccount });
+      console.log('Pharmacy registration successful.');
+      alert('pharmacy registration successful.');
     }catch(error){
-      console.error('Error registering pharmacy:', error);}
+      console.log('Error registering pharmacy:', error);
       alert('!!Error!! Pharmacy registration Unsuccessful.');
+    }
+    
   }
 
 async function PatientsRegistration(value) {
     try{
-      const accountDropdown = document.getElementById('accountDropdown');
+    const accountDropdown = document.getElementById('accountDropdown');
     const selectedAccount = accountDropdown.value; // Get the selected account from the dropdown
     
     if (!selectedAccount) {
       alert('Please select an account first.');
       return;
     }
-      await RegistrationContract.PatientRegistration(value).send({ from: selectedAccount });
+      await RegistrationContract.methods.PatientRegistration(value).send({ from: selectedAccount });
+      console.log('Patient registration successful.');
+      alert('Patient registration successful.');
     }catch(error){
-      console.error('Error registering patient:', error);}
+      console.error('Error registering patient:', error.reason);
       alert('!!Error!! Patient registration Unsuccessful.');
+    }
   }
 
 
@@ -929,7 +937,9 @@ async function PresciptionCreation(patientid,drug1,drug2,drug3) {
       alert('Please select an account first.');
       return;
     }
-  await ApprovalContract.methods.PresciptionCreation(patientid,drug1,drug2,drug3).send({ from: selectedAccount });
+  await ApprovalContract.methods.PrescriptionCreation(patientid,drug1,drug2,drug3).send({ from: selectedAccount });
+  console.log('Prescription creation successful.');
+  alert('Prescription creation successful.');
   } catch (error) {
     console.error('Error creating prescription:', error);
     alert('!!Error!! Prescription creation Unsuccessful. check if 1)patient is registered 2)request is coming from registered physician');
@@ -947,6 +957,8 @@ async function PharmacySelection(value) {
       return;
     }
   await ApprovalContract.methods.Pharmacies_Selection(value).send({ from: selectedAccount });
+  console.log('Pharmacy selection successful.');
+  alert( 'Pharmacy selection successful.');
   } catch (error) {
     console.error('Error selecting pharmacy:', error);
     alert('!!Error!! Pharmacy selection Unsuccessful.');
@@ -964,6 +976,8 @@ async function PharmacyApproval(value) {
       return;
     }
   await ApprovalContract.methods.PharmacyApproval(value).send({ from: selectedAccount });
+  console.log('Pharmacy approval successful.');
+  alert('Pharmacy approval successful.');
   } catch (error) {
     console.error('Error approving pharmacy:', error);
     alert('!!Error!! Pharmacy approval Unsuccessful.');
@@ -981,6 +995,9 @@ async function InsuranceApprovalRequest(value) {
       return;
     }
   await ApprovalContract.methods.RequestInsuranceApproval(value).send({ from: selectedAccount });
+  console.log( 'Insurance approval request successful.');
+  alert('Insurance approval request successful.');
+
   }catch(error){
     console.error('Error requesting insurance approval:', error);
     alert('!!Error!! Insurance approval request Unsuccessful.');
@@ -997,6 +1014,9 @@ async function InsuranceApproval(pharmacyid,patientid) {
       return;
     }
   await ApprovalContract.methods.RequestInsuranceApproval(pending,pharmacyid,patientid).send({ from: selectedAccount});
+  console.log('Insurance approval successful.');
+  alert( 'Insurance approval successful.');
+
   } catch (error) {
     console.error('Error requesting insurance approval:', error);
     alert("!!Error!! Insurance approval Unsuccessful.");
@@ -1013,6 +1033,8 @@ async function medicine_preparation(value) {
       return;
     }
   await ApprovalContract.methods.MedicationPreparetion(value).send({ from: selectedAccount });
+  console.log('Medication preparation successful.');
+  alert('Medication preparation successful.')
   } catch (error) {
     console.error('Error preparing medication:', error);
     alert('!!Error!! Medication preparation Unsuccessful.');
@@ -1029,6 +1051,10 @@ async function medicine_collection(value) {
       return;
     }
   await ApprovalContract.methods.MedicationCollection(value).send({ from: selectedAccount });
+  console.log('Medication collection successful.');
+  alert( 'Medication collection successful.');
+
+
   }catch(error){
     console.error('Error collecting medication:', error);
     alert('!!Error!! Medication collection Unsuccessful.');
@@ -1045,6 +1071,9 @@ async function requestpayment(invoiceid,totalcost) {
       return;
     }
   await ApprovalContract.methods.PaymentRequest(invoiceid,totalcost).send({ from: selectedAccount });
+  console.log('Payment request successful.');
+  alert( 'Payment request successful.');
+
   }catch(error){
     console.error('Error requesting payment:', error);
     alert('!!Error!! Payment request Unsuccessful.');
@@ -1062,6 +1091,8 @@ async function Claimpayment(value) {
       return;
     }
   await ApprovalContract.methods.ClaimPayment(value).send({ from: selectedAccount });
+  console.log('Payment claim successful.');
+  alert( 'Payment claim successful.');
   }catch(error){
     console.error('Error claiming payment:', error);
     alert('!!Error!! Payment claim Unsuccessful.');
@@ -1076,13 +1107,13 @@ document.getElementById('Physician_Registration').addEventListener('click', () =
 
 document.getElementById('Patient_Registration').addEventListener('click',() =>{
   let patient=document.getElementById('patient_reg').value
-  PatientsRegistration(patient)});
+  PatientsRegistration(patient);});
 document.getElementById('InsuranceCompanyRegistration').addEventListener('click',()=>{
   let  InsuranceCompany=document.getElementById('Company_reg').value
   InsuranceCompaniesRegistration(InsuranceCompany)});
 document.getElementById('Pharmacy_Registration').addEventListener('click',()=> {
   let Pharmacy=document.getElementById('pharmacy_reg').value
-  PharmaciesRegistration(Pharmacy)});
+  PharmaciesRegistration(Pharmacy);});
 
 //FOR CONTRACT APPROVAL
 document.getElementById('createpresciption').addEventListener('click', () => {
