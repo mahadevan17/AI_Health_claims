@@ -4,7 +4,6 @@ pragma solidity ^0.8.15;
 contract Registration {
     // Variables
     address public regulatory_authority;
-
     mapping(address => bool) public patients;
     mapping(address => bool) public insuranceCompanies;
     mapping(address => bool) public physicians;
@@ -19,7 +18,6 @@ contract Registration {
         require(msg.sender == regulatory_authority, "Only regulatory authority can register");
         _;
     }
-
     // Events
     event PhysicianRegistered(address indexed physician);
     event InsuranceCompanyRegistered(address indexed insuranceCompany);
@@ -27,7 +25,6 @@ contract Registration {
     event PatientRegistered(address indexed patient);
 
     // Functions
-
     function PhysicianRegistration(address _Physician) external OnlyRegulatoryAuthority {
         require(!physicians[_Physician], "Physician already registered");
         physicians[_Physician] = true;

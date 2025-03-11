@@ -805,11 +805,11 @@ const Approval_contractABI=[{
       "internalType": "uint256",
       "name": "",
       "type": "uint256"
-    }],
-    "stateMutability": "view",
-    "type": "function"
     }
-  ];
+  ],
+  "stateMutability": "view",
+  "type": "function"
+}];
 const Approval_contractAddress='0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512'
 
 
@@ -854,6 +854,14 @@ web3.eth.getAccounts()
 
 async function PhysiciansRegistration(value) {
     try{
+
+      const accounts = await web3.eth.getAccounts();
+      console.log("First Account (Expected Deployer):", accounts[0]);
+      const regulatoryAuthority = await RegistrationContract.methods.regulatory_authority().call();
+      console.log("Regulatory Authority from Contract:", regulatoryAuthority);
+      alert ("First Account (Expected Deployer): ", accounts[0], "\n Regulatory Authority from Contract: ",regulatoryAuthority);
+      
+
       const accountDropdown = document.getElementById('accountDropdown');
       const selectedAccount = accountDropdown.value; // Get the selected account from the dropdown
     

@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "F:\\blockchain\\aihealthcare\\contracts\\Medicare_claims.sol": {
-      "lastModificationDate": 1741256497534,
-      "contentHash": "717f5e4bf4a6dc8d0d7d9176349c8469",
+      "lastModificationDate": 1741690858150,
+      "contentHash": "360d5d4a84aaaeace61b5c282ede4a7e",
       "sourceName": "contracts/Medicare_claims.sol",
       "solcConfig": {
         "version": "0.8.15",
@@ -19,12 +19,19 @@
                 "evm.bytecode",
                 "evm.deployedBytecode",
                 "evm.methodIdentifiers",
-                "metadata"
+                "metadata",
+                "devdoc",
+                "userdoc",
+                "storageLayout",
+                "evm.gasEstimates"
               ],
               "": [
                 "ast"
               ]
             }
+          },
+          "metadata": {
+            "useLiteralContent": true
           }
         }
       },
