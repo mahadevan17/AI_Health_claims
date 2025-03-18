@@ -822,11 +822,11 @@ const ApprovalContract = new web3.eth.Contract(Approval_contractABI, Approval_co
 // Connection status element
 const connectionStatus = document.getElementById('connection-status');
 
-// Check if connected to Ganache
+// Check if connected to hardhat
 web3.eth.getAccounts()
   .then(accounts => {
     if (accounts.length > 0) {
-      connectionStatus.innerText = `Connected to Ganache: ${accounts.length} account(s) found.`;
+      connectionStatus.innerText = `Connected to hardhat: ${accounts.length} account(s) found.`;
       connectionStatus.style.color = 'green';
       accountDropdown.innerHTML = '<option value="">Select an account</option>';
       
@@ -840,12 +840,12 @@ web3.eth.getAccounts()
 
 
     } else {
-      connectionStatus.innerText = 'No accounts found. Please check Ganache.';
+      connectionStatus.innerText = 'No accounts found. Please check hardhat.';
       connectionStatus.style.color = 'red';
     }
   })
   .catch(error => {
-    console.error('Error connecting to Ganache:', error);
+    console.error('Error connecting to hardhat:', error);
     connectionStatus.innerText = 'Error connecting to ethereum node. Please ensure it is running.';
     connectionStatus.style.color = 'red';
   });
@@ -854,15 +854,7 @@ web3.eth.getAccounts()
 
 async function PhysiciansRegistration(value) {
     try{
-
-      const accounts = await web3.eth.getAccounts();
-      console.log("First Account (Expected Deployer):", accounts[0]);
-      const regulatoryAuthority = await RegistrationContract.methods.regulatory_authority().call();
-      console.log("Regulatory Authority from Contract:", regulatoryAuthority);
-      alert ("First Account (Expected Deployer): ", accounts[0], "\n Regulatory Authority from Contract: ",regulatoryAuthority);
-      
-
-      const accountDropdown = document.getElementById('accountDropdown');
+     const accountDropdown = document.getElementById('accountDropdown');
       const selectedAccount = accountDropdown.value; // Get the selected account from the dropdown
     
     if (!selectedAccount) {
@@ -945,7 +937,14 @@ async function PresciptionCreation(patientid,drug1,drug2,drug3) {
       alert('Please select an account first.');
       return;
     }
-  await ApprovalContract.methods.PrescriptionCreation(patientid,drug1,drug2,drug3).send({ from: selectedAccount });
+
+    let hash=await uploadToIPFS(patientid,drug1,drug2,drug3); // Upload the prescription to IPFS
+    if (!hash) {
+      alert('Failed to upload to IPFS. Try again.');
+      return;
+    }
+
+  await ApprovalContract.methods.PrescriptionCreation(patientid,drug1,drug2,drug3,hash).send({ from: selectedAccount });
   console.log('Prescription creation successful.');
   alert('Prescription creation successful.');
   } catch (error) {
@@ -964,6 +963,8 @@ async function PharmacySelection(value) {
       alert('Please select an account first.');
       return;
     }
+    //const pharmacies = await RegistrationContract.pharmacies().call();
+
   await ApprovalContract.methods.Pharmacies_Selection(value).send({ from: selectedAccount });
   console.log('Pharmacy selection successful.');
   alert( 'Pharmacy selection successful.');
@@ -993,7 +994,7 @@ async function PharmacyApproval(value) {
 
 }
 
-async function InsuranceApprovalRequest(value) {
+async function InsuranceApprovalRequest(patientID,drug1,drug2,drug3) {
   try {
     const accountDropdown = document.getElementById('accountDropdown');
     const selectedAccount = accountDropdown.value; // Get the selected account from the dropdown
@@ -1002,7 +1003,7 @@ async function InsuranceApprovalRequest(value) {
       alert('Please select an account first.');
       return;
     }
-  await ApprovalContract.methods.RequestInsuranceApproval(value).send({ from: selectedAccount });
+  await ApprovalContract.methods.RequestInsuranceApproval(patientID,drug1,drug2,drug3).send({ from: selectedAccount });
   console.log( 'Insurance approval request successful.');
   alert('Insurance approval request successful.');
 
@@ -1021,7 +1022,7 @@ async function InsuranceApproval(pharmacyid,patientid) {
       alert('Please select an account first.');
       return;
     }
-  await ApprovalContract.methods.RequestInsuranceApproval(pending,pharmacyid,patientid).send({ from: selectedAccount});
+  await ApprovalContract.methods.InsuranceApproval(1,pharmacyid,patientid).send({ from: selectedAccount});
   console.log('Insurance approval successful.');
   alert( 'Insurance approval successful.');
 
@@ -1040,7 +1041,7 @@ async function medicine_preparation(value) {
       alert('Please select an account first.');
       return;
     }
-  await ApprovalContract.methods.MedicationPreparetion(value).send({ from: selectedAccount });
+  await ApprovalContract.methods.MedicationPreparation(value).send({ from: selectedAccount });
   console.log('Medication preparation successful.');
   alert('Medication preparation successful.')
   } catch (error) {
@@ -1093,17 +1094,79 @@ async function Claimpayment(value) {
   try{
     const accountDropdown = document.getElementById('accountDropdown');
     const selectedAccount = accountDropdown.value; // Get the selected account from the dropdown
-    
+
+    let amt=await ApprovalContract.methods.DrugTotalCost().call()
+
     if (!selectedAccount) {
       alert('Please select an account first.');
       return;
     }
-  await ApprovalContract.methods.ClaimPayment(value).send({ from: selectedAccount });
+  await ApprovalContract.methods.ClaimPayment(value).send({ from: selectedAccount , value: amt });
   console.log('Payment claim successful.');
   alert( 'Payment claim successful.');
   }catch(error){
     console.error('Error claiming payment:', error);
     alert('!!Error!! Payment claim Unsuccessful.');
+  }
+}
+
+//for ipfs uploading 
+
+async function uploadToIPFS(patientid, drug1, drug2, drug3) {
+  const API_KEY = "3dc10fbfcd597b7ccc32";  
+  const API_SECRET = "4239d6878221ac5ed912c6ae571b22f83e8100ae6a31639639b57b61f055c08c";  
+
+  if (!patientid || !drug1 || !drug2 || !drug3) {
+    alert("Please fill in all fields!");
+    return null;
+  }
+
+  const jsonData = {
+    patientID: patientid,
+    drug1: drug1,
+    drug2: drug2,
+    drug3: drug3,
+    timestamp: new Date().toISOString() // Adds a timestamp for record keeping
+  };
+
+  const metadata = {
+    name: `Prescription_${patientid}`, 
+  };
+
+  const pinataBody = {
+    pinataContent: jsonData,
+    pinataMetadata: metadata // Add filename metadata
+  };
+
+  document.getElementById("ipfs-status").innerText = "Uploading...";
+
+  try {
+    let response = await fetch("https://api.pinata.cloud/pinning/pinJSONToIPFS", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "pinata_api_key": API_KEY,
+        "pinata_secret_api_key": API_SECRET
+      },
+      body: JSON.stringify(pinataBody),
+    });
+
+    let data = await response.json();
+    
+    if (data.IpfsHash) {
+      document.getElementById("ipfs-status").innerText = "Upload Successful!";
+      document.getElementById("ipfsHash").innerText = data.IpfsHash;
+      console.log("Data uploaded to IPFS:", data);
+      return data.IpfsHash;
+    } else {
+      document.getElementById("ipfs-status").innerText = "Upload failed!";
+      console.error("Upload failed:", data);
+      return null;
+    }
+  } catch (error) {
+    document.getElementById("ipfs-status").innerText = "Error uploading!";
+    console.error("Error:", error);
+    return null; 
   }
 }
 
@@ -1133,7 +1196,9 @@ document.getElementById('createpresciption').addEventListener('click', () => {
 
   //pharmacy selection********************************
 
-  //document.getElementById('Pharmacy_Registration').addEventListener('click', PharmaciesRegistration);
+  document.getElementById('select-pharmacy').addEventListener('click', () => {
+      let pharma_id=document.getElementById('pharmacy_id').value;
+      PharmacySelection(pharma_id);});
 
   //pharmacy approval
   document.getElementById('approvepharmacy').addEventListener('click', () => {
@@ -1155,7 +1220,7 @@ document.getElementById('approval').addEventListener('click', () => {
   InsuranceApproval(pharmacyid,patientID) });
 
 // medicine preparation
-document.getElementById('preparemedicine').addEventListener('click',()=>{
+document.getElementById('preparemedicine').addEventListener('click', () => {
   let patientid=document.getElementById('patientId').value;
 
   medicine_preparation(patientid);});
@@ -1167,7 +1232,7 @@ document.getElementById('medicinecollect').addEventListener('click',()=>{
   medicine_collection(patientid);});
 
 //request payment
-document.getElementById('requestpayment').addEventListener('click',()=>{
+document.getElementById('paymentrequest').addEventListener('click',()=>{
   let invoiceid=document.getElementById('medicineinvoiceid').value;
   let totalcost=document.getElementById('medicinecost').value;
   requestpayment(invoiceid,totalcost) });
@@ -1175,5 +1240,4 @@ document.getElementById('requestpayment').addEventListener('click',()=>{
 //claim payment
 document.getElementById('paymentclaim').addEventListener('click',()=>{
   let  invoiceid=document.getElementById('medicineinvoice_id').value;
-
   Claimpayment(invoiceid)});

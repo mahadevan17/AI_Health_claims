@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
-  <title>String Storage DApp</title>
+  <title>Medicare claims DApp</title>
 </head>
 <body>
   <div class="container">
@@ -40,14 +40,18 @@
     Drug Code 2&nbsp;<input id="Drug2" type="text" placeholder="Drug Code 2"><br>
     Drug Code 3&nbsp;<input id="Drug3" type="text" placeholder="Drug Code 3"><br>
     <button id="createpresciption">Create Presciption</button>
+    <p id="ipfs-status"></p>
+    <p><strong>IPFS CID:</strong> <span id="ipfsHash"></span></p>
    </div>
 
    <hr>
 
-   <!-- NEEDS WORK-->
    <div id="pharmacyselection">
     <h3>ONLY PATIENT | PHARMACY SELECTION</h3>
     <input id="pharmacy_id" type="text" placeholder="Pharmacy ID">
+    <label>Select Pharmacy:</label>
+    <select id="pharmacyDropdown"></select>
+    <button id="select-pharmacy">Select Pharmacy</button>
 
    </div>
    <hr>
@@ -82,7 +86,7 @@
   <div id="medicinepreparation">
     <h3>ONLY PHARMACY | MEDICINE PREPARATION</h3>
     <input type="text" id="patientId" placeholder="Patient ID">
-    <button id="preparedmedicine">Update Status</button>
+    <button id="preparemedicine">Update Status</button>
   </div>
 <hr>
   <div id="medicinecollection">
