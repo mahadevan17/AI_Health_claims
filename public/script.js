@@ -1013,6 +1013,56 @@ async function InsuranceApprovalRequest(patientID,drug1,drug2,drug3) {
   }
 }
 
+//ml is need after request for insurance 
+
+async function submitTransaction(userData) {
+  try {
+      // Send data to ML model API
+      const response = await fetch(ML_API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ features: userData }),
+      });
+
+      const result = await response.json();
+      if (!result.approved) {
+          alert("Transaction rejected by ML model.");
+          return true;
+      }
+      else{
+        return false
+      }
+      
+    } catch (error) {
+        console.error("Error:", error);
+        alert("Transaction failed.");
+    }
+}
+
+async function checkML(){
+
+  try{
+    let isfraud=await submitTransaction(patientID);
+
+    if (isfraud){
+      console.log("flagging patient id and prescription id");
+    }
+
+    else {
+      console.log("no flag patient id and prescription id are not fraud");
+    }
+
+  }
+  
+  catch(error){
+    console.error('Error requesting insurance approval:', error);
+    alert("!!Error try again");
+  }
+
+
+}
+
+
 async function InsuranceApproval(pharmacyid,patientid) {
   try {
     const accountDropdown = document.getElementById('accountDropdown');
@@ -1122,6 +1172,7 @@ async function uploadToIPFS(patientid, drug1, drug2, drug3) {
   }
 
   const jsonData = {
+    flag: 0,
     patientID: patientid,
     drug1: drug1,
     drug2: drug2,
